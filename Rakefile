@@ -5,7 +5,7 @@ require "bundler/setup"
 require "jekyll"
 
 # Change your GitHub reponame
-GITHUB_REPONAME = "qwfys/zetsu"
+GITHUB_REPONAME = "qwfys/laohugou"
 GITHUB_REPO_BRANCH = "gh-pages"
 
 namespace :site do
