@@ -1,0 +1,1207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>laohugou</title>
+    <description>We thrive on the road together</description>
+    <link>https://www.qwfys.com/laohugou/laohugou/</link>
+    <atom:link href="https://www.qwfys.com/laohugou/laohugou/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 26 Mar 2021 01:03:53 +0800</pubDate>
+    <lastBuildDate>Fri, 26 Mar 2021 01:03:53 +0800</lastBuildDate>
+    <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>openjdk</title>
+        <description>&lt;h1 id=&quot;jdk-configuration&quot;&gt;JDK configuration&lt;/h1&gt;
+
+&lt;p&gt;The project is built based on JDK11, so to run the project, you need a JDK11 compatible JDK. Considering that Oracle commercial JDK charges enterprises, we recommend that you use Open JDK 11, which can be downloaded &lt;a href=&quot;https://jdk.java.net/archive/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://oscimg.oschina.net/oscnet/up-8df92de1dbe0df325e4f41557aee4594510.JPEG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;maven-configuration&quot;&gt;maven configuration&lt;/h1&gt;
+
+&lt;p&gt;Edit the file ~/.m2/settings.xml, find the tag named servers, and add the following content to it:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;        &amp;lt;server&amp;gt;
+            &amp;lt;id&amp;gt;official-docker&amp;lt;/id&amp;gt;
+            &amp;lt;username&amp;gt;qwfys&amp;lt;/username&amp;gt;
+            &amp;lt;password&amp;gt;**********&amp;lt;/password&amp;gt;
+            &amp;lt;configuration&amp;gt;
+                &amp;lt;email&amp;gt;qwfys200@qq.com&amp;lt;/email&amp;gt;
+            &amp;lt;/configuration&amp;gt;
+        &amp;lt;/server&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;~ Is a symbolic representation of the user directory, if we have a user with a login name of lwk, under normal circumstances, in the Linux / Uninx system, the root user directory is / root, and the non-root user directory is / home / lwk . In Windows 7 / 8.x / 10, the user directory is C: \ Users \ lwk.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;project-struct&quot;&gt;project struct&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;common&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Dockerfile is common to all projects and is located in the root directory of the project. The contents are as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM openjdk:11-jdk
+VOLUME /tmp
+ARG JAR_FILE
+ADD ${JAR_FILE} app.jar
+RUN bash -c &#39;touch /app.jar&#39;
+EXPOSE 18000
+ENTRYPOINT [&quot;java&quot;, &quot;-Djava.security.egd=file:/dev/./urandom&quot;,&quot;-jar&quot;, &quot;/app.jar&quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Considering that we currently build and push the docker image for the project to the image warehouse, all through the plugin named dockerfile. We focus on listing the pom.xml files of each project to help you configure the details.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;user-business&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;pom.xml&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;
+&amp;lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+
+    &amp;lt;parent&amp;gt;
+        &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;user-business&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+    &amp;lt;/parent&amp;gt;
+
+    &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;user-business-impl&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+
+    &amp;lt;properties&amp;gt;
+        &amp;lt;!--&amp;lt;docker.image.organization&amp;gt;registry.cn-hangzhou.aliyuncs.com/qwfys&amp;lt;/docker.image.organization&amp;gt;--&amp;gt;
+        &amp;lt;docker.image.organization&amp;gt;lanzhou&amp;lt;/docker.image.organization&amp;gt;
+        &amp;lt;docker.image.repository&amp;gt;user-business&amp;lt;/docker.image.repository&amp;gt;
+        &amp;lt;!--&amp;lt;docker.tag.version&amp;gt;0.0.1.release&amp;lt;/docker.tag.version&amp;gt;--&amp;gt;
+        &amp;lt;docker.tag.version&amp;gt;latest&amp;lt;/docker.tag.version&amp;gt;
+    &amp;lt;/properties&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;user-business-spec&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;${project.version}&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;user-repository-spec&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;${project.version}&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-alibaba-nacos-discovery&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-alibaba-nacos-config&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-configuration-processor&amp;lt;/artifactId&amp;gt;
+            &amp;lt;optional&amp;gt;true&amp;lt;/optional&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-dubbo&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+            &amp;lt;exclusions&amp;gt;
+                &amp;lt;exclusion&amp;gt;
+                    &amp;lt;groupId&amp;gt;org.junit.vintage&amp;lt;/groupId&amp;gt;
+                    &amp;lt;artifactId&amp;gt;junit-vintage-engine&amp;lt;/artifactId&amp;gt;
+                &amp;lt;/exclusion&amp;gt;
+            &amp;lt;/exclusions&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+    &amp;lt;build&amp;gt;
+        &amp;lt;finalName&amp;gt;${project.name}&amp;lt;/finalName&amp;gt;
+        &amp;lt;plugins&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-boot-maven-plugin&amp;lt;/artifactId&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;com.spotify&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;dockerfile-maven-plugin&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;1.4.13&amp;lt;/version&amp;gt;
+                &amp;lt;configuration&amp;gt;
+                    &amp;lt;repository&amp;gt;${docker.image.organization}/${docker.image.repository}&amp;lt;/repository&amp;gt;
+                    &amp;lt;tag&amp;gt;${docker.tag.version}&amp;lt;/tag&amp;gt;
+                    &amp;lt;tag&amp;gt;${docker.tag.version}&amp;lt;/tag&amp;gt;
+                    &amp;lt;buildArgs&amp;gt;
+                        &amp;lt;JAR_FILE&amp;gt;target/${project.build.finalName}.jar&amp;lt;/JAR_FILE&amp;gt;
+                    &amp;lt;/buildArgs&amp;gt;
+                    &amp;lt;useMavenSettingsForAuth&amp;gt;true&amp;lt;/useMavenSettingsForAuth&amp;gt;
+                &amp;lt;/configuration&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+        &amp;lt;/plugins&amp;gt;
+
+    &amp;lt;/build&amp;gt;
+    &amp;lt;repositories&amp;gt;
+        &amp;lt;!--&amp;lt;repository&amp;gt;--&amp;gt;
+        &amp;lt;!--    &amp;lt;id&amp;gt;aliyun-docker&amp;lt;/id&amp;gt;--&amp;gt;
+        &amp;lt;!--    &amp;lt;url&amp;gt;registry.cn-hangzhou.aliyuncs.com&amp;lt;/url&amp;gt;--&amp;gt;
+        &amp;lt;!--&amp;lt;/repository&amp;gt;        --&amp;gt;
+        &amp;lt;repository&amp;gt;
+            &amp;lt;id&amp;gt;official-docker&amp;lt;/id&amp;gt;
+            &amp;lt;url&amp;gt;https://index.docker.io/v1/&amp;lt;/url&amp;gt;
+        &amp;lt;/repository&amp;gt;
+    &amp;lt;/repositories&amp;gt;
+
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;user-service&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;
+&amp;lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+
+    &amp;lt;parent&amp;gt;
+        &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;user-service&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+    &amp;lt;/parent&amp;gt;
+
+    &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;user-service-impl&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+
+    &amp;lt;properties&amp;gt;
+        &amp;lt;!--&amp;lt;docker.image.organization&amp;gt;registry.cn-hangzhou.aliyuncs.com/qwfys&amp;lt;/docker.image.organization&amp;gt;--&amp;gt;
+        &amp;lt;docker.image.organization&amp;gt;lanzhou&amp;lt;/docker.image.organization&amp;gt;
+        &amp;lt;docker.image.repository&amp;gt;user-service&amp;lt;/docker.image.repository&amp;gt;
+        &amp;lt;!--&amp;lt;docker.tag.version&amp;gt;0.0.1.release&amp;lt;/docker.tag.version&amp;gt;--&amp;gt;
+        &amp;lt;docker.tag.version&amp;gt;latest&amp;lt;/docker.tag.version&amp;gt;
+    &amp;lt;/properties&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;user-service-spec&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;user-business-spec&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-alibaba-nacos-discovery&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-alibaba-nacos-config&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-configuration-processor&amp;lt;/artifactId&amp;gt;
+            &amp;lt;optional&amp;gt;true&amp;lt;/optional&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-dubbo&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+            &amp;lt;exclusions&amp;gt;
+                &amp;lt;exclusion&amp;gt;
+                    &amp;lt;groupId&amp;gt;org.junit.vintage&amp;lt;/groupId&amp;gt;
+                    &amp;lt;artifactId&amp;gt;junit-vintage-engine&amp;lt;/artifactId&amp;gt;
+                &amp;lt;/exclusion&amp;gt;
+            &amp;lt;/exclusions&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+    &amp;lt;build&amp;gt;
+        &amp;lt;finalName&amp;gt;${project.name}&amp;lt;/finalName&amp;gt;
+        &amp;lt;plugins&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-boot-maven-plugin&amp;lt;/artifactId&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;com.spotify&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;dockerfile-maven-plugin&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;1.4.13&amp;lt;/version&amp;gt;
+                &amp;lt;configuration&amp;gt;
+                    &amp;lt;repository&amp;gt;${docker.image.organization}/${docker.image.repository}&amp;lt;/repository&amp;gt;
+                    &amp;lt;tag&amp;gt;${docker.tag.version}&amp;lt;/tag&amp;gt;
+                    &amp;lt;buildArgs&amp;gt;
+                        &amp;lt;JAR_FILE&amp;gt;target/${project.build.finalName}.jar&amp;lt;/JAR_FILE&amp;gt;
+                    &amp;lt;/buildArgs&amp;gt;
+                    &amp;lt;useMavenSettingsForAuth&amp;gt;true&amp;lt;/useMavenSettingsForAuth&amp;gt;
+                &amp;lt;/configuration&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+        &amp;lt;/plugins&amp;gt;
+
+    &amp;lt;/build&amp;gt;
+    &amp;lt;repositories&amp;gt;
+        &amp;lt;!--&amp;lt;repository&amp;gt;--&amp;gt;
+        &amp;lt;!--    &amp;lt;id&amp;gt;aliyun-docker&amp;lt;/id&amp;gt;--&amp;gt;
+        &amp;lt;!--    &amp;lt;url&amp;gt;registry.cn-hangzhou.aliyuncs.com&amp;lt;/url&amp;gt;--&amp;gt;
+        &amp;lt;!--&amp;lt;/repository&amp;gt;        --&amp;gt;
+        &amp;lt;repository&amp;gt;
+            &amp;lt;id&amp;gt;official-docker&amp;lt;/id&amp;gt;
+            &amp;lt;url&amp;gt;https://index.docker.io/v1/&amp;lt;/url&amp;gt;
+        &amp;lt;/repository&amp;gt;
+    &amp;lt;/repositories&amp;gt;
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;user-api&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;
+&amp;lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+
+    &amp;lt;parent&amp;gt;
+        &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;dragon-api&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+    &amp;lt;/parent&amp;gt;
+
+    &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;usr-api&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+
+    &amp;lt;description&amp;gt;user-oriented&amp;lt;/description&amp;gt;
+
+    &amp;lt;properties&amp;gt;
+        &amp;lt;!--&amp;lt;docker.image.organization&amp;gt;registry.cn-hangzhou.aliyuncs.com/qwfys&amp;lt;/docker.image.organization&amp;gt;--&amp;gt;
+        &amp;lt;docker.image.organization&amp;gt;lanzhou&amp;lt;/docker.image.organization&amp;gt;
+        &amp;lt;docker.image.repository&amp;gt;user-api&amp;lt;/docker.image.repository&amp;gt;
+        &amp;lt;!--&amp;lt;docker.tag.version&amp;gt;0.0.1.release&amp;lt;/docker.tag.version&amp;gt;--&amp;gt;
+        &amp;lt;docker.tag.version&amp;gt;latest&amp;lt;/docker.tag.version&amp;gt;
+    &amp;lt;/properties&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.xtwj.mall&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;user-service-spec&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;${project.version}&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-alibaba-nacos-discovery&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-alibaba-nacos-config&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-configuration-processor&amp;lt;/artifactId&amp;gt;
+            &amp;lt;optional&amp;gt;true&amp;lt;/optional&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-dubbo&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.projectlombok&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;lombok&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.spring4all&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;swagger-spring-boot-starter&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;1.9.1.RELEASE&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+            &amp;lt;exclusions&amp;gt;
+                &amp;lt;exclusion&amp;gt;
+                    &amp;lt;groupId&amp;gt;org.junit.vintage&amp;lt;/groupId&amp;gt;
+                    &amp;lt;artifactId&amp;gt;junit-vintage-engine&amp;lt;/artifactId&amp;gt;
+                &amp;lt;/exclusion&amp;gt;
+            &amp;lt;/exclusions&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+    &amp;lt;build&amp;gt;
+        &amp;lt;finalName&amp;gt;${project.name}&amp;lt;/finalName&amp;gt;
+        &amp;lt;plugins&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-boot-maven-plugin&amp;lt;/artifactId&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;com.spotify&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;dockerfile-maven-plugin&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;1.4.13&amp;lt;/version&amp;gt;
+                &amp;lt;configuration&amp;gt;
+                    &amp;lt;repository&amp;gt;${docker.image.organization}/${docker.image.repository}&amp;lt;/repository&amp;gt;
+                    &amp;lt;tag&amp;gt;${docker.tag.version}&amp;lt;/tag&amp;gt;
+                    &amp;lt;buildArgs&amp;gt;
+                        &amp;lt;JAR_FILE&amp;gt;target/${project.build.finalName}.jar&amp;lt;/JAR_FILE&amp;gt;
+                    &amp;lt;/buildArgs&amp;gt;
+                    &amp;lt;useMavenSettingsForAuth&amp;gt;true&amp;lt;/useMavenSettingsForAuth&amp;gt;
+                &amp;lt;/configuration&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+        &amp;lt;/plugins&amp;gt;
+    &amp;lt;/build&amp;gt;
+    &amp;lt;repositories&amp;gt;
+        &amp;lt;!--&amp;lt;repository&amp;gt;--&amp;gt;
+        &amp;lt;!--    &amp;lt;id&amp;gt;aliyun-docker&amp;lt;/id&amp;gt;--&amp;gt;
+        &amp;lt;!--    &amp;lt;url&amp;gt;registry.cn-hangzhou.aliyuncs.com&amp;lt;/url&amp;gt;--&amp;gt;
+        &amp;lt;!--&amp;lt;/repository&amp;gt;        --&amp;gt;
+        &amp;lt;repository&amp;gt;
+            &amp;lt;id&amp;gt;official-docker&amp;lt;/id&amp;gt;
+            &amp;lt;url&amp;gt;https://index.docker.io/v1/&amp;lt;/url&amp;gt;
+        &amp;lt;/repository&amp;gt;
+    &amp;lt;/repositories&amp;gt;
+
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;login-to-dokcer-hub&quot;&gt;login to dokcer hub&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;lwk@qwfys:~$ docker login --username=qwfys
+Password: 
+WARNING! Your password will be stored unencrypted in /home/lwk/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+lwk@qwfys:~$ 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;create-repository-on-docker-hub&quot;&gt;create repository on docker hub&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;step 1
+Create an organization named lanzhou on docker hub.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;step 2
+Create three repositories under the organization named lanzhou, named user-api, user-service, user-business.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://oscimg.oschina.net/oscnet/up-252b10b0e823321ab21b3a9a1ad37cb85fe.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;build--push-with-dockerfile&quot;&gt;build &amp;amp; push with dockerfile&lt;/h1&gt;
+&lt;p&gt;Use the maven plugin named dockerfile to build a docker image based on the current project and push it to the corresponding repositoriy on the docker hub.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;for project named user-business&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;lwk@qwfys:~/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl$ mvn clean install dockerfile:build dockerfile:push
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by com.google.inject.internal.cglib.core.$ReflectUtils$1 (file:/usr/share/maven/lib/guice.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of com.google.inject.internal.cglib.core.$ReflectUtils$1
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------&amp;lt; com.xtwj.mall:user-business-impl &amp;gt;------------------
+[INFO] Building user-business-impl 0.0.1-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ user-business-impl ---
+[INFO] Deleting /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:apply (default) @ user-business-impl ---
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:validate (default) @ user-business-impl ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:resources (default-resources) @ user-business-impl ---
+[INFO] Using &#39;UTF-8&#39; encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ user-business-impl ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 3 source files to /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:testResources (default-testResources) @ user-business-impl ---
+[INFO] Using &#39;UTF-8&#39; encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ user-business-impl ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.21.0:test (default-test) @ user-business-impl ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- maven-jar-plugin:3.1.0:jar (default-jar) @ user-business-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl.jar
+[INFO] 
+[INFO] --- maven-javadoc-plugin:3.1.0:jar (javadoc) @ user-business-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-javadoc.jar
+[INFO] 
+[INFO] --- maven-javadoc-plugin:3.1.0:jar (default) @ user-business-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-javadoc.jar
+[INFO] 
+[INFO] &amp;gt;&amp;gt;&amp;gt; maven-source-plugin:3.0.1:jar (attach-sources) &amp;gt; generate-sources @ user-business-impl &amp;gt;&amp;gt;&amp;gt;
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:apply (default) @ user-business-impl ---
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:validate (default) @ user-business-impl ---
+[INFO] 
+[INFO] &amp;lt;&amp;lt;&amp;lt; maven-source-plugin:3.0.1:jar (attach-sources) &amp;lt; generate-sources @ user-business-impl &amp;lt;&amp;lt;&amp;lt;
+[INFO] 
+[INFO] 
+[INFO] --- maven-source-plugin:3.0.1:jar (attach-sources) @ user-business-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-sources.jar
+[INFO] 
+[INFO] --- maven-source-plugin:3.0.1:jar-no-fork (default) @ user-business-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-sources.jar
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.2.1.RELEASE:repackage (default) @ user-business-impl ---
+[INFO] Replacing main artifact with repackaged archive
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ user-business-impl ---
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-business-impl/0.0.1-SNAPSHOT/user-business-impl-0.0.1-SNAPSHOT.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/pom.xml to /home/lwk/.m2/repository/com/xtwj/mall/user-business-impl/0.0.1-SNAPSHOT/user-business-impl-0.0.1-SNAPSHOT.pom
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-javadoc.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-business-impl/0.0.1-SNAPSHOT/user-business-impl-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-javadoc.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-business-impl/0.0.1-SNAPSHOT/user-business-impl-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-sources.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-business-impl/0.0.1-SNAPSHOT/user-business-impl-0.0.1-SNAPSHOT-sources.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-sources.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-business-impl/0.0.1-SNAPSHOT/user-business-impl-0.0.1-SNAPSHOT-sources.jar
+[INFO] 
+[INFO] --- dockerfile-maven-plugin:1.4.13:build (default-cli) @ user-business-impl ---
+[INFO] dockerfile: null
+[INFO] contextDirectory: /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl
+[INFO] Building Docker context /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl
+[INFO] Path(dockerfile): null
+[INFO] Path(contextDirectory): /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl
+[INFO] 
+[INFO] Image will be built as lanzhou/user-business:latest
+[INFO] 
+[INFO] Step 1/7 : FROM openjdk:11-jdk
+[INFO] 
+[INFO] Pulling from library/openjdk
+[INFO] Digest: sha256:c03d9833fa868027f586b86ddcc0c9d02efc81ed4825d535efc590f5bdda7327
+[INFO] Status: Image is up to date for openjdk:11-jdk
+[INFO]  ---&amp;gt; ecea1177bed0
+[INFO] Step 2/7 : VOLUME /tmp
+[INFO] 
+[INFO]  ---&amp;gt; Using cache
+[INFO]  ---&amp;gt; 6d3d1ae86d01
+[INFO] Step 3/7 : ARG JAR_FILE
+[INFO] 
+[INFO]  ---&amp;gt; Using cache
+[INFO]  ---&amp;gt; 27ff65287565
+[INFO] Step 4/7 : ADD ${JAR_FILE} app.jar
+[INFO] 
+[INFO]  ---&amp;gt; 2d98683595d1
+[INFO] Step 5/7 : RUN bash -c &#39;touch /app.jar&#39;
+[INFO] 
+[INFO]  ---&amp;gt; Running in 6c83e249a298
+[INFO] Removing intermediate container 6c83e249a298
+[INFO]  ---&amp;gt; 10943668e1e0
+[INFO] Step 6/7 : EXPOSE 18000
+[INFO] 
+[INFO]  ---&amp;gt; Running in 46e4d9404564
+[INFO] Removing intermediate container 46e4d9404564
+[INFO]  ---&amp;gt; a1f70db1bbb2
+[INFO] Step 7/7 : ENTRYPOINT [&quot;java&quot;, &quot;-Djava.security.egd=file:/dev/./urandom&quot;,&quot;-jar&quot;, &quot;/app.jar&quot;]
+[INFO] 
+[INFO]  ---&amp;gt; Running in 1922a29d5f25
+[INFO] Removing intermediate container 1922a29d5f25
+[INFO]  ---&amp;gt; 5bc0313d3efb
+[INFO] Successfully built 5bc0313d3efb
+[INFO] Successfully tagged lanzhou/user-business:latest
+[INFO] 
+[INFO] Detected build of image with id 5bc0313d3efb
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl/target/user-business-impl-docker-info.jar
+[INFO] Successfully built lanzhou/user-business:latest
+[INFO] 
+[INFO] --- dockerfile-maven-plugin:1.4.13:push (default-cli) @ user-business-impl ---
+[WARNING] Did not find maven server configuration for docker server docker.io
+[INFO] The push refers to repository [docker.io/lanzhou/user-business]
+[INFO] Image 5a64dbe3b54c: Preparing
+[INFO] Image fbed4f2c9b32: Preparing
+[INFO] Image 38c8683424bf: Preparing
+[INFO] Image 2fcb5a3afb1f: Preparing
+[INFO] Image 27974e3533d3: Preparing
+[INFO] Image d35c5bda4793: Preparing
+[INFO] Image a3c1026c6bcc: Preparing
+[INFO] Image f1d420c2af1a: Preparing
+[INFO] Image 461719022993: Preparing
+[INFO] Image d35c5bda4793: Waiting
+[INFO] Image a3c1026c6bcc: Waiting
+[INFO] Image f1d420c2af1a: Waiting
+[INFO] Image 461719022993: Waiting
+[INFO] Image 2fcb5a3afb1f: Pushing
+[INFO] Image fbed4f2c9b32: Pushing
+[INFO] Image 5a64dbe3b54c: Pushing
+[INFO] Image fbed4f2c9b32: Pushed
+[INFO] Image 2fcb5a3afb1f: Pushed
+[INFO] Image 38c8683424bf: Pushing
+[INFO] Image 27974e3533d3: Pushing
+[INFO] Image d35c5bda4793: Pushing
+[INFO] Image 5a64dbe3b54c: Pushed
+[INFO] Image a3c1026c6bcc: Pushing
+[INFO] Image 27974e3533d3: Pushed
+[INFO] Image f1d420c2af1a: Pushing
+[INFO] Image 461719022993: Pushing
+[INFO] Image d35c5bda4793: Pushed
+[INFO] Image a3c1026c6bcc: Pushed
+[INFO] Image f1d420c2af1a: Pushed
+[INFO] Image 461719022993: Pushed
+[INFO] Image 38c8683424bf: Pushed
+[INFO] latest: digest: sha256:6bf40e4490ad7a73e882cf02df490022c3478ceb3bd6ae91debc431b7b2a56c8 size: 2218
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:16 min
+[INFO] Finished at: 2020-04-20T13:26:30+08:00
+[INFO] ------------------------------------------------------------------------
+lwk@qwfys:~/Public/project/com/qwfys/dragon/dragon-business/user-business/user-business-impl$ 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;for project named user-service&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;lwk@qwfys:~/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl$ mvn clean install dockerfile:build dockerfile:push
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by com.google.inject.internal.cglib.core.$ReflectUtils$1 (file:/usr/share/maven/lib/guice.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of com.google.inject.internal.cglib.core.$ReflectUtils$1
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------&amp;lt; com.xtwj.mall:user-service-impl &amp;gt;-------------------
+[INFO] Building user-service-impl 0.0.1-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ user-service-impl ---
+[INFO] Deleting /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:apply (default) @ user-service-impl ---
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:validate (default) @ user-service-impl ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:resources (default-resources) @ user-service-impl ---
+[INFO] Using &#39;UTF-8&#39; encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ user-service-impl ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 4 source files to /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:testResources (default-testResources) @ user-service-impl ---
+[INFO] Using &#39;UTF-8&#39; encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ user-service-impl ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.21.0:test (default-test) @ user-service-impl ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- maven-jar-plugin:3.1.0:jar (default-jar) @ user-service-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl.jar
+[INFO] 
+[INFO] --- maven-javadoc-plugin:3.1.0:jar (javadoc) @ user-service-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-javadoc.jar
+[INFO] 
+[INFO] --- maven-javadoc-plugin:3.1.0:jar (default) @ user-service-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-javadoc.jar
+[INFO] 
+[INFO] &amp;gt;&amp;gt;&amp;gt; maven-source-plugin:3.0.1:jar (attach-sources) &amp;gt; generate-sources @ user-service-impl &amp;gt;&amp;gt;&amp;gt;
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:apply (default) @ user-service-impl ---
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:validate (default) @ user-service-impl ---
+[INFO] 
+[INFO] &amp;lt;&amp;lt;&amp;lt; maven-source-plugin:3.0.1:jar (attach-sources) &amp;lt; generate-sources @ user-service-impl &amp;lt;&amp;lt;&amp;lt;
+[INFO] 
+[INFO] 
+[INFO] --- maven-source-plugin:3.0.1:jar (attach-sources) @ user-service-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-sources.jar
+[INFO] 
+[INFO] --- maven-source-plugin:3.0.1:jar-no-fork (default) @ user-service-impl ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-sources.jar
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.2.1.RELEASE:repackage (default) @ user-service-impl ---
+[INFO] Replacing main artifact with repackaged archive
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ user-service-impl ---
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-service-impl/0.0.1-SNAPSHOT/user-service-impl-0.0.1-SNAPSHOT.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/pom.xml to /home/lwk/.m2/repository/com/xtwj/mall/user-service-impl/0.0.1-SNAPSHOT/user-service-impl-0.0.1-SNAPSHOT.pom
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-javadoc.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-service-impl/0.0.1-SNAPSHOT/user-service-impl-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-javadoc.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-service-impl/0.0.1-SNAPSHOT/user-service-impl-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-sources.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-service-impl/0.0.1-SNAPSHOT/user-service-impl-0.0.1-SNAPSHOT-sources.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-sources.jar to /home/lwk/.m2/repository/com/xtwj/mall/user-service-impl/0.0.1-SNAPSHOT/user-service-impl-0.0.1-SNAPSHOT-sources.jar
+[INFO] 
+[INFO] --- dockerfile-maven-plugin:1.4.13:build (default-cli) @ user-service-impl ---
+[INFO] dockerfile: null
+[INFO] contextDirectory: /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl
+[INFO] Building Docker context /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl
+[INFO] Path(dockerfile): null
+[INFO] Path(contextDirectory): /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl
+[INFO] 
+[INFO] Image will be built as lanzhou/user-service:latest
+[INFO] 
+[INFO] Step 1/7 : FROM openjdk:11-jdk
+[INFO] 
+[INFO] Pulling from library/openjdk
+[INFO] Digest: sha256:c03d9833fa868027f586b86ddcc0c9d02efc81ed4825d535efc590f5bdda7327
+[INFO] Status: Image is up to date for openjdk:11-jdk
+[INFO]  ---&amp;gt; ecea1177bed0
+[INFO] Step 2/7 : VOLUME /tmp
+[INFO] 
+[INFO]  ---&amp;gt; Using cache
+[INFO]  ---&amp;gt; 6d3d1ae86d01
+[INFO] Step 3/7 : ARG JAR_FILE
+[INFO] 
+[INFO]  ---&amp;gt; Using cache
+[INFO]  ---&amp;gt; 27ff65287565
+[INFO] Step 4/7 : ADD ${JAR_FILE} app.jar
+[INFO] 
+[INFO]  ---&amp;gt; 69c36df2f825
+[INFO] Step 5/7 : RUN bash -c &#39;touch /app.jar&#39;
+[INFO] 
+[INFO]  ---&amp;gt; Running in d42637bde22a
+[INFO] Removing intermediate container d42637bde22a
+[INFO]  ---&amp;gt; 37ff60ddd734
+[INFO] Step 6/7 : EXPOSE 18000
+[INFO] 
+[INFO]  ---&amp;gt; Running in b84e24045f41
+[INFO] Removing intermediate container b84e24045f41
+[INFO]  ---&amp;gt; ad14301ad6ad
+[INFO] Step 7/7 : ENTRYPOINT [&quot;java&quot;, &quot;-Djava.security.egd=file:/dev/./urandom&quot;,&quot;-jar&quot;, &quot;/app.jar&quot;]
+[INFO] 
+[INFO]  ---&amp;gt; Running in 08f459131831
+[INFO] Removing intermediate container 08f459131831
+[INFO]  ---&amp;gt; 60d4d9045b43
+[INFO] Successfully built 60d4d9045b43
+[INFO] Successfully tagged lanzhou/user-service:latest
+[INFO] 
+[INFO] Detected build of image with id 60d4d9045b43
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl/target/user-service-impl-docker-info.jar
+[INFO] Successfully built lanzhou/user-service:latest
+[INFO] 
+[INFO] --- dockerfile-maven-plugin:1.4.13:push (default-cli) @ user-service-impl ---
+[WARNING] Did not find maven server configuration for docker server docker.io
+[INFO] The push refers to repository [docker.io/lanzhou/user-service]
+[INFO] Image 50710bdf600e: Preparing
+[INFO] Image a7ddd4a51cbc: Preparing
+[INFO] Image 38c8683424bf: Preparing
+[INFO] Image 2fcb5a3afb1f: Preparing
+[INFO] Image 27974e3533d3: Preparing
+[INFO] Image d35c5bda4793: Preparing
+[INFO] Image a3c1026c6bcc: Preparing
+[INFO] Image f1d420c2af1a: Preparing
+[INFO] Image 461719022993: Preparing
+[INFO] Image d35c5bda4793: Waiting
+[INFO] Image a3c1026c6bcc: Waiting
+[INFO] Image f1d420c2af1a: Waiting
+[INFO] Image 461719022993: Waiting
+[INFO] Image 50710bdf600e: Pushing
+[INFO] Image a7ddd4a51cbc: Pushing
+[INFO] Image 2fcb5a3afb1f: Mounted from lanzhou/user-business
+[INFO] Image 27974e3533d3: Mounted from lanzhou/user-business
+[INFO] Image 38c8683424bf: Mounted from lanzhou/user-business
+[INFO] Image a3c1026c6bcc: Mounted from lanzhou/user-business
+[INFO] Image 50710bdf600e: Pushed
+[INFO] Image d35c5bda4793: Mounted from lanzhou/user-business
+[INFO] Image f1d420c2af1a: Mounted from lanzhou/user-business
+[INFO] Image 461719022993: Mounted from lanzhou/user-business
+[INFO] Image a7ddd4a51cbc: Pushed
+[INFO] latest: digest: sha256:7960c98adf8cfb87b1eb873438d1e03c25ce5abac2570946f5e74bfd1e9d011f size: 2218
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:23 min
+[INFO] Finished at: 2020-04-20T13:28:00+08:00
+[INFO] ------------------------------------------------------------------------
+lwk@qwfys:~/Public/project/com/qwfys/dragon/dragon-service/user-service/user-service-impl$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;for project name usr-api&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;lwk@qwfys:~/Public/project/com/qwfys/dragon/dragon-api/usr-api$ mvn clean install dockerfile:build dockerfile:push
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by com.google.inject.internal.cglib.core.$ReflectUtils$1 (file:/usr/share/maven/lib/guice.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of com.google.inject.internal.cglib.core.$ReflectUtils$1
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------&amp;lt; com.xtwj.mall:usr-api &amp;gt;------------------------
+[INFO] Building usr-api 0.0.1-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ usr-api ---
+[INFO] Deleting /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:apply (default) @ usr-api ---
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:validate (default) @ usr-api ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:resources (default-resources) @ usr-api ---
+[INFO] Using &#39;UTF-8&#39; encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ usr-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 5 source files to /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:testResources (default-testResources) @ usr-api ---
+[INFO] Using &#39;UTF-8&#39; encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ usr-api ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.21.0:test (default-test) @ usr-api ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- maven-jar-plugin:3.1.0:jar (default-jar) @ usr-api ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api.jar
+[INFO] 
+[INFO] --- maven-javadoc-plugin:3.1.0:jar (javadoc) @ usr-api ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-javadoc.jar
+[INFO] 
+[INFO] --- maven-javadoc-plugin:3.1.0:jar (default) @ usr-api ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-javadoc.jar
+[INFO] 
+[INFO] &amp;gt;&amp;gt;&amp;gt; maven-source-plugin:3.0.1:jar (attach-sources) &amp;gt; generate-sources @ usr-api &amp;gt;&amp;gt;&amp;gt;
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:apply (default) @ usr-api ---
+[INFO] 
+[INFO] --- spring-javaformat-maven-plugin:0.0.9:validate (default) @ usr-api ---
+[INFO] 
+[INFO] &amp;lt;&amp;lt;&amp;lt; maven-source-plugin:3.0.1:jar (attach-sources) &amp;lt; generate-sources @ usr-api &amp;lt;&amp;lt;&amp;lt;
+[INFO] 
+[INFO] 
+[INFO] --- maven-source-plugin:3.0.1:jar (attach-sources) @ usr-api ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-sources.jar
+[INFO] 
+[INFO] --- maven-source-plugin:3.0.1:jar-no-fork (default) @ usr-api ---
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-sources.jar
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.2.1.RELEASE:repackage (default) @ usr-api ---
+[INFO] Replacing main artifact with repackaged archive
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ usr-api ---
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api.jar to /home/lwk/.m2/repository/com/xtwj/mall/usr-api/0.0.1-SNAPSHOT/usr-api-0.0.1-SNAPSHOT.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/pom.xml to /home/lwk/.m2/repository/com/xtwj/mall/usr-api/0.0.1-SNAPSHOT/usr-api-0.0.1-SNAPSHOT.pom
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-javadoc.jar to /home/lwk/.m2/repository/com/xtwj/mall/usr-api/0.0.1-SNAPSHOT/usr-api-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-javadoc.jar to /home/lwk/.m2/repository/com/xtwj/mall/usr-api/0.0.1-SNAPSHOT/usr-api-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-sources.jar to /home/lwk/.m2/repository/com/xtwj/mall/usr-api/0.0.1-SNAPSHOT/usr-api-0.0.1-SNAPSHOT-sources.jar
+[INFO] Installing /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-sources.jar to /home/lwk/.m2/repository/com/xtwj/mall/usr-api/0.0.1-SNAPSHOT/usr-api-0.0.1-SNAPSHOT-sources.jar
+[INFO] 
+[INFO] --- dockerfile-maven-plugin:1.4.13:build (default-cli) @ usr-api ---
+[INFO] dockerfile: null
+[INFO] contextDirectory: /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api
+[INFO] Building Docker context /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api
+[INFO] Path(dockerfile): null
+[INFO] Path(contextDirectory): /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api
+[INFO] 
+[INFO] Image will be built as lanzhou/user-api:latest
+[INFO] 
+[INFO] Step 1/7 : FROM openjdk:11-jdk
+[INFO] 
+[INFO] Pulling from library/openjdk
+[INFO] Digest: sha256:c03d9833fa868027f586b86ddcc0c9d02efc81ed4825d535efc590f5bdda7327
+[INFO] Status: Image is up to date for openjdk:11-jdk
+[INFO]  ---&amp;gt; ecea1177bed0
+[INFO] Step 2/7 : VOLUME /tmp
+[INFO] 
+[INFO]  ---&amp;gt; Using cache
+[INFO]  ---&amp;gt; 6d3d1ae86d01
+[INFO] Step 3/7 : ARG JAR_FILE
+[INFO] 
+[INFO]  ---&amp;gt; Using cache
+[INFO]  ---&amp;gt; 27ff65287565
+[INFO] Step 4/7 : ADD ${JAR_FILE} app.jar
+[INFO] 
+[INFO]  ---&amp;gt; 647ee379d768
+[INFO] Step 5/7 : RUN bash -c &#39;touch /app.jar&#39;
+[INFO] 
+[INFO]  ---&amp;gt; Running in 311c0ca3eed1
+[INFO] Removing intermediate container 311c0ca3eed1
+[INFO]  ---&amp;gt; 164a94ed6e82
+[INFO] Step 6/7 : EXPOSE 18000
+[INFO] 
+[INFO]  ---&amp;gt; Running in c6fb5ff5673a
+[INFO] Removing intermediate container c6fb5ff5673a
+[INFO]  ---&amp;gt; 2e29956a39d5
+[INFO] Step 7/7 : ENTRYPOINT [&quot;java&quot;, &quot;-Djava.security.egd=file:/dev/./urandom&quot;,&quot;-jar&quot;, &quot;/app.jar&quot;]
+[INFO] 
+[INFO]  ---&amp;gt; Running in e4892ef98529
+[INFO] Removing intermediate container e4892ef98529
+[INFO]  ---&amp;gt; d80892132614
+[INFO] Successfully built d80892132614
+[INFO] Successfully tagged lanzhou/user-api:latest
+[INFO] 
+[INFO] Detected build of image with id d80892132614
+[INFO] Building jar: /home/lwk/Public/project/com/qwfys/dragon/dragon-api/usr-api/target/usr-api-docker-info.jar
+[INFO] Successfully built lanzhou/user-api:latest
+[INFO] 
+[INFO] --- dockerfile-maven-plugin:1.4.13:push (default-cli) @ usr-api ---
+[WARNING] Did not find maven server configuration for docker server docker.io
+[INFO] The push refers to repository [docker.io/lanzhou/user-api]
+[INFO] Image b45cd27c3790: Preparing
+[INFO] Image 5b35cc8afc2c: Preparing
+[INFO] Image 38c8683424bf: Preparing
+[INFO] Image 2fcb5a3afb1f: Preparing
+[INFO] Image 27974e3533d3: Preparing
+[INFO] Image d35c5bda4793: Preparing
+[INFO] Image a3c1026c6bcc: Preparing
+[INFO] Image f1d420c2af1a: Preparing
+[INFO] Image 461719022993: Preparing
+[INFO] Image d35c5bda4793: Waiting
+[INFO] Image a3c1026c6bcc: Waiting
+[INFO] Image f1d420c2af1a: Waiting
+[INFO] Image 461719022993: Waiting
+[INFO] Image b45cd27c3790: Pushing
+[INFO] Image 5b35cc8afc2c: Pushing
+[INFO] Image 27974e3533d3: Mounted from lanzhou/user-service
+[INFO] Image 38c8683424bf: Mounted from lanzhou/user-service
+[INFO] Image 2fcb5a3afb1f: Mounted from lanzhou/user-service
+[INFO] Image d35c5bda4793: Mounted from lanzhou/user-service
+[INFO] Image f1d420c2af1a: Mounted from lanzhou/user-service
+[INFO] Image a3c1026c6bcc: Mounted from lanzhou/user-service
+[INFO] Image 5b35cc8afc2c: Pushed
+[INFO] Image b45cd27c3790: Pushed
+[INFO] Image 461719022993: Mounted from lanzhou/user-service
+[INFO] latest: digest: sha256:d1c2b9c65f0037371f4e199ad7c56c64b424484267959bdf32af5b2d88276bf6 size: 2218
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:16 min
+[INFO] Finished at: 2020-04-20T13:29:23+08:00
+[INFO] ------------------------------------------------------------------------
+lwk@qwfys:~/Public/project/com/qwfys/dragon/dragon-api/usr-api$ 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;run&quot;&gt;Run&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;step 1 search docker image&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;[root@xtwj90 ~]# docker search lanzhou
+NAME                    DESCRIPTION         STARS               OFFICIAL            AUTOMATED
+lanzhou/user-business                       0                                       
+lanzhou/user-service                        0                                       
+lanzhou/user-api                            0                                       
+[root@xtwj90 ~]# 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;step2 run&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;[root@xtwj90 ~]# docker run -d --name user-business lanzhou/user-business
+Unable to find image &#39;lanzhou/user-business:latest&#39; locally
+latest: Pulling from lanzhou/user-business
+7e2b2a5af8f6: Pull complete 
+09b6f03ffac4: Pull complete 
+dc3f0c679f0f: Pull complete 
+fd4b47407fc3: Pull complete 
+bb40faab53a2: Pull complete 
+4bb55ce33bc6: Pull complete 
+b2c255cea82d: Pull complete 
+d8523297843c: Pull complete 
+d74a19fc4ded: Pull complete 
+Digest: sha256:6bf40e4490ad7a73e882cf02df490022c3478ceb3bd6ae91debc431b7b2a56c8
+Status: Downloaded newer image for lanzhou/user-business:latest
+84d59fe471ea39ad5c8a9d9a48caca35921a79c62b9712bcb859c144ab00c460
+[root@xtwj90 ~]# docker run -d --name user-service lanzhou/user-service
+Unable to find image &#39;lanzhou/user-service:latest&#39; locally
+latest: Pulling from lanzhou/user-service
+7e2b2a5af8f6: Already exists 
+09b6f03ffac4: Already exists 
+dc3f0c679f0f: Already exists 
+fd4b47407fc3: Already exists 
+bb40faab53a2: Already exists 
+4bb55ce33bc6: Already exists 
+b2c255cea82d: Already exists 
+97241e915afc: Pull complete 
+32be84694706: Pull complete 
+Digest: sha256:7960c98adf8cfb87b1eb873438d1e03c25ce5abac2570946f5e74bfd1e9d011f
+Status: Downloaded newer image for lanzhou/user-service:latest
+add3525792b3f7572d732a26aca5f9a24f87a24679fd2ac82942cc36d5c45592
+[root@xtwj90 ~]# docker run -d --name user-backend -p 18000:18000 lanzhou/user-api
+Unable to find image &#39;lanzhou/user-api:latest&#39; locally
+latest: Pulling from lanzhou/user-api
+7e2b2a5af8f6: Already exists 
+09b6f03ffac4: Already exists 
+dc3f0c679f0f: Already exists 
+fd4b47407fc3: Already exists 
+bb40faab53a2: Already exists 
+4bb55ce33bc6: Already exists 
+b2c255cea82d: Already exists 
+05e259fd5e9c: Pull complete 
+4c60065635a9: Pull complete 
+Digest: sha256:d1c2b9c65f0037371f4e199ad7c56c64b424484267959bdf32af5b2d88276bf6
+Status: Downloaded newer image for lanzhou/user-api:latest
+bea17018d7e608b0fdc5c53f1b8be922b85d31a2cf79f2b0d28a66fcdee248e9
+[root@xtwj90 ~]# docker ps -a
+CONTAINER ID        IMAGE                   COMMAND                  CREATED             STATUS              PORTS                      NAMES
+bea17018d7e6        lanzhou/user-api        &quot;java -Djava.securit…&quot;   37 seconds ago      Up 35 seconds       0.0.0.0:18000-&amp;gt;18000/tcp   user-backend
+add3525792b3        lanzhou/user-service    &quot;java -Djava.securit…&quot;   5 minutes ago       Up 5 minutes        18000/tcp                  user-service
+84d59fe471ea        lanzhou/user-business   &quot;java -Djava.securit…&quot;   8 minutes ago       Up 8 minutes        18000/tcp                  user-business
+[root@xtwj90 ~]# 
+[root@xtwj90 ~]# ss -ntlp
+State      Recv-Q Send-Q                                                                          Local Address:Port                                                                                         Peer Address:Port              
+LISTEN     0      100                                                                                 127.0.0.1:25                                                                                                      *:*                   users:((&quot;master&quot;,pid=1547,fd=13))
+LISTEN     0      128                                                                                         *:22                                                                                                      *:*                   users:((&quot;sshd&quot;,pid=1147,fd=3))
+LISTEN     0      100                                                                                     [::1]:25                                                                                                   [::]:*                   users:((&quot;master&quot;,pid=1547,fd=14))
+LISTEN     0      128                                                                                      [::]:18000                                                                                                [::]:*                   users:((&quot;docker-proxy&quot;,pid=7004,fd=4))
+LISTEN     0      128                                                                                      [::]:22                                                                                                   [::]:*                   users:((&quot;sshd&quot;,pid=1147,fd=4))
+[root@xtwj90 ~]# 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;打开浏览器http://192.168.3.90:18000/swagger-ui.html
+&lt;img src=&quot;https://oscimg.oschina.net/oscnet/up-22cbb9b340356bef0856ef2399ac596af8e.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://oscimg.oschina.net/oscnet/up-7c22b86e31861b9e52487d3d3d0f7023d1a.JPEG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;至此运行成功。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 22 Mar 2021 18:24:32 +0000</pubDate>
+        <link>https://www.qwfys.com/laohugou/laohugou/openjdk/</link>
+        <guid isPermaLink="true">https://www.qwfys.com/laohugou/laohugou/openjdk/</guid>
+        
+        
+        <category>jdk</category>
+        
+      </item>
+    
+      <item>
+        <title>Welcome to Jekyll!</title>
+        <description>&lt;p&gt;You’ll find this post in your &lt;code&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+
+&lt;p&gt;To add new posts, simply add a file in the &lt;code&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+
+&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;Tom&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints &amp;#39;Hi, Tom&amp;#39; to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://github.com/jekyll/jekyll-help&quot;&gt;Jekyll’s dedicated Help repository&lt;/a&gt;.&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 08 Aug 2015 03:00:08 +0000</pubDate>
+        <link>https://www.qwfys.com/laohugou/laohugou/welcome-to-jekyll/</link>
+        <guid isPermaLink="true">https://www.qwfys.com/laohugou/laohugou/welcome-to-jekyll/</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Lorem ipsum dolor sit amet, consectetuer adipiscing elit</title>
+        <description>&lt;p&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.&lt;/p&gt;
+
+&lt;p&gt;Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi.&lt;/p&gt;
+
+&lt;p&gt;Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue.&lt;/p&gt;
+
+&lt;p&gt;Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus.&lt;/p&gt;
+
+&lt;p&gt;Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero.&lt;/p&gt;
+
+&lt;p&gt;Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia.&lt;/p&gt;
+
+&lt;p&gt;Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget, posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc nonummy metus.&lt;/p&gt;
+
+&lt;p&gt;Vestibulum volutpat pretium libero. Cras id dui. Aenean ut eros et nisl sagittis vestibulum. Nullam nulla eros, ultricies sit amet, nonummy id, imperdiet feugiat, pede. Sed lectus. Donec mollis hendrerit risus. Phasellus nec sem in justo pellentesque facilisis. Etiam imperdiet imperdiet orci.&lt;/p&gt;
+
+&lt;p&gt;Nunc nec neque. Phasellus leo dolor, tempus non, auctor et, hendrerit quis, nisi. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Maecenas malesuada. Praesent congue erat at massa. Sed cursus turpis vitae tortor. Donec posuere vulputate arcu. Phasellus accumsan cursus velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed aliquam, nisi quis porttitor congue, elit erat euismod orci.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 07 Aug 2015 03:00:08 +0000</pubDate>
+        <link>https://www.qwfys.com/laohugou/laohugou/lorem-ipsum-dolor/</link>
+        <guid isPermaLink="true">https://www.qwfys.com/laohugou/laohugou/lorem-ipsum-dolor/</guid>
+        
+        
+        <category>lorem</category>
+        
+      </item>
+    
+      <item>
+        <title>Lorem ipsum dolor sit amet</title>
+        <description>&lt;p&gt;&lt;strong&gt;Pellentesque habitant morbi tristique&lt;/strong&gt; senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. &lt;em&gt;Aenean ultricies mi vitae est.&lt;/em&gt; Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, &lt;code&gt;commodo vitae&lt;/code&gt;, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. &lt;a href=&quot;#&quot;&gt;Donec non enim&lt;/a&gt; in turpis pulvinar facilisis. Ut felis.&lt;/p&gt;
+
+&lt;h1&gt;Header Level 1&lt;/h1&gt;
+&lt;h2&gt;Header Level 2&lt;/h2&gt;
+
+&lt;p&gt;Unordered list&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit.&lt;/li&gt;
+  &lt;li&gt;Aliquam tincidunt mauris eu risus.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna. Cras in mi at felis aliquet congue. Ut a est eget ligula molestie gravida. Curabitur massa. Donec eleifend, libero at sagittis mollis, tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretium ornare est.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;h3&gt;Header Level 3&lt;/h3&gt;
+
+&lt;p&gt;Ordered list&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Lorem ipsum dolor sit amet, consectetuer adipiscing elit.&lt;/li&gt;
+  &lt;li&gt;Aliquam tincidunt mauris eu risus.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;span class=&quot;nf&quot;&gt;#header&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;h1&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;block&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;300px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;80px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h4&gt;Header Level 4&lt;/h4&gt;
+&lt;h5&gt;Header Level 5&lt;/h5&gt;
+&lt;h6&gt;Header Level 6&lt;/h6&gt;
+</description>
+        <pubDate>Fri, 07 Aug 2015 03:00:08 +0000</pubDate>
+        <link>https://www.qwfys.com/laohugou/laohugou/lorem/</link>
+        <guid isPermaLink="true">https://www.qwfys.com/laohugou/laohugou/lorem/</guid>
+        
+        
+        <category>lorem</category>
+        
+      </item>
+    
+      <item>
+        <title>The quick, brown fox jumps over a lazy dog</title>
+        <description>&lt;p&gt;The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced by fox whelps. Bawds jog, flick quartz, vex nymphs. Waltz, bad nymph, for quick jigs vex! Fox nymphs grab quick-jived waltz.&lt;/p&gt;
+
+&lt;p&gt;Brick quiz whangs jumpy veldt fox. Bright vixens jump; dozy fowl quack. Quick wafting zephyrs vex bold Jim. Quick zephyrs blow, vexing daft Jim. Sex-charged fop blew my junk TV quiz. How quickly daft jumping zebras vex.&lt;/p&gt;
+
+&lt;p&gt;Two driven jocks help fax my big quiz. Quick, Baz, get my woven flax jodhpurs! “Now fax quiz Jack! “ my brave ghost pled. Five quacking zephyrs jolt my wax bed. Flummoxed by job, kvetching W. zaps Iraq. Cozy sphinx waves quart jug of bad milk.&lt;/p&gt;
+
+&lt;p&gt;A very bad quack might jinx zippy fowls. Few quips galvanized the mock jury box. Quick brown dogs jump over the lazy fox. The jay, pig, fox, zebra, and my wolves quack! Blowzy red vixens fight for a quick jump.&lt;/p&gt;
+
+&lt;p&gt;Joaquin Phoenix was gazed by MTV for luck. A wizard’s job is to vex chumps quickly in fog. Watch “Jeopardy! “, Alex Trebek’s fun TV quiz game. Woven silk pyjamas exchanged for blue quartz. Brawny gods just flocked up to quiz and vex him.&lt;/p&gt;
+
+&lt;p&gt;Adjusting quiver and bow, Zompyc[1] killed the fox. My faxed joke won a pager in the cable TV quiz show. Amazingly few discotheques provide jukeboxes. My girl wove six dozen plaid jackets before she quit. Six big devils from Japan quickly forgot how to waltz.&lt;/p&gt;
+
+&lt;p&gt;Big July earthquakes confound zany experimental vow. Foxy parsons quiz and cajole the lovably dim wiki-girl. Have a pick: twenty six letters - no forcing a jumbled quiz! Crazy Fredericka bought many very exquisite opal jewels.&lt;/p&gt;
+
+&lt;p&gt;Sixty zippers were quickly picked from the woven jute bag. A quick movement of the enemy will jeopardize six gunboats. All questions asked by five watch experts amazed the judge. Jack quietly moved up front and seized the big ball of wax.&lt;/p&gt;
+
+&lt;p&gt;The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced by fox whelps. Bawds jog, flick quartz, vex nymphs. Waltz, bad nymph, for quick jigs vex! Fox nymphs grab quick-jived waltz. Brick quiz whangs jumpy veldt fox.&lt;/p&gt;
+
+&lt;p&gt;Bright vixens jump; dozy fowl quack. Quick wafting zephyrs vex bold Jim. Quick zephyrs blow, vexing daft Jim. Sex-charged fop blew my junk TV quiz. How quickly daft jumping zebras vex. Two driven jocks help fax my big quiz. Quick, Baz, get my woven flax jodhpurs!&lt;/p&gt;
+
+&lt;p&gt;“Now fax quiz Jack! “ my brave ghost pled. Five quacking zephyrs jolt my wax bed. Flummoxed by job, kvetching W. zaps Iraq. Cozy sphinx waves quart jug of bad milk. A very bad quack might jinx zippy fowls. Few quips galvanized the mock jury box. Quick brown dogs jump over the lazy fox. The jay, pig, fox, zebra, and my wolves quack! Blowzy red vixens fight for a quick jump. Joaquin Phoenix was gazed by MTV&lt;/p&gt;
+</description>
+        <pubDate>Thu, 06 Aug 2015 03:00:08 +0000</pubDate>
+        <link>https://www.qwfys.com/laohugou/laohugou/the-quick-brown-fox/</link>
+        <guid isPermaLink="true">https://www.qwfys.com/laohugou/laohugou/the-quick-brown-fox/</guid>
+        
+        
+        <category>lorem</category>
+        
+      </item>
+    
+      <item>
+        <title>A wonderful serenity has taken possession of my entire soul</title>
+        <description>&lt;p&gt;A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart. I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine.&lt;/p&gt;
+
+&lt;p&gt;I am so happy, my dear friend, so absorbed in the exquisite sense of mere tranquil existence, that I neglect my talents.&lt;/p&gt;
+
+&lt;p&gt;I should be incapable of drawing a single stroke at the present moment; and yet I feel that I never was a greater artist than now.&lt;/p&gt;
+
+&lt;p&gt;When, while the lovely valley teems with vapour around me, and the meridian sun strikes the upper surface of the impenetrable foliage of my trees, and but a few stray gleams steal into the inner sanctuary, I throw myself down among the tall grass by the trickling stream; and, as I lie close to the earth, a thousand unknown plants are noticed by me: when I hear the buzz of the little world among the stalks, and grow familiar with the countless indescribable forms of the insects and flies, then I feel the presence of the Almighty, who formed us in his own image, and the breath of that universal love which bears and sustains us, as it floats around us in an eternity of bliss; and then, my friend, when darkness overspreads my eyes, and heaven and earth seem to dwell in my soul and absorb its power, like the form of a beloved mistress, then I often think with longing, Oh, would I could describe these conceptions, could impress upon paper all that is living so full and warm within me, that it might be the mirror of my soul, as my soul is the mirror of the infinite God!&lt;/p&gt;
+
+&lt;p&gt;O my friend – but it is too much for my strength – I sink under the weight of the splendour of these visions!&lt;/p&gt;
+
+&lt;p&gt;A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.&lt;/p&gt;
+
+&lt;p&gt;I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine.&lt;/p&gt;
+
+&lt;p&gt;I am so happy, my dear friend, so absorbed in the exquisite sense of mere tranquil existence, that I neglect my talents.&lt;/p&gt;
+
+&lt;p&gt;I should be incapable of drawing a single stroke at the present moment; and yet I feel that I never was a greater artist than now.&lt;/p&gt;
+
+&lt;p&gt;When, while the lovely valley teems with vapour around me, and the meridian sun strikes the upper surface of the impenetrable foliage of my trees, and but a few stray gleams steal into the inner sanctuary, I throw myself down among the tall grass by the trickling stream; and, as I lie close to the earth, a thousand unknown plants are noticed by me: when I hear the buzz of the little world among the stalks, and grow familiar with the countless indescribable forms of the insects and&lt;/p&gt;
+</description>
+        <pubDate>Wed, 05 Aug 2015 03:00:08 +0000</pubDate>
+        <link>https://www.qwfys.com/laohugou/laohugou/a-wonderful-serenity-has-taken/</link>
+        <guid isPermaLink="true">https://www.qwfys.com/laohugou/laohugou/a-wonderful-serenity-has-taken/</guid>
+        
+        
+        <category>lorem</category>
+        
+      </item>
+    
+      <item>
+        <title>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia</title>
+        <description>&lt;p&gt;Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.&lt;/p&gt;
+
+&lt;p&gt;A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.&lt;/p&gt;
+
+&lt;p&gt;Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.&lt;/p&gt;
+
+&lt;p&gt;The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. She packed her seven versalia, put her initial into the belt and made herself on the way.&lt;/p&gt;
+
+&lt;p&gt;When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane.&lt;/p&gt;
+
+&lt;p&gt;Pityful a rethoric question ran over her cheek, then she continued her way. On her way she met a copy.&lt;/p&gt;
+
+&lt;p&gt;The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word “and” and the Little Blind Text should turn around and return to its own, safe country.&lt;/p&gt;
+
+&lt;p&gt;But nothing the copy said could convince her and so it didn’t take long until a few insidious Copy Writers ambushed her, made her drunk with Longe and Parole and dragged her into their agency, where they abused her for their projects again and again. And if she hasn’t been rewritten, then they are still using her.&lt;/p&gt;
+
+&lt;p&gt;Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.&lt;/p&gt;
+
+&lt;p&gt;It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.&lt;/p&gt;
+
+&lt;p&gt;The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. She packed her seven versalia, put her initial into the belt and made herself on the way. When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline&lt;/p&gt;
+</description>
+        <pubDate>Tue, 04 Aug 2015 03:00:08 +0000</pubDate>
+        <link>https://www.qwfys.com/laohugou/laohugou/far-far-away/</link>
+        <guid isPermaLink="true">https://www.qwfys.com/laohugou/laohugou/far-far-away/</guid>
+        
+        
+        <category>lorem</category>
+        
+      </item>
+    
+  </channel>
+</rss>
