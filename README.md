@@ -23,9 +23,9 @@
 
 ### Start in 4 steps
 
-1. Download or clone repo `git clone git@github.com:nandomoreirame/zetsu.git`
-2. Enter the folder: `cd zetsu/`
-3. Install Ruby gems: `bundle install`
+1. Download or clone repo `git clone git@github.com:qwfys/laohugou.git`
+2. Enter the folder: `cd laohugou/`
+3. Install Ruby gems: `bundle exec jekyll serve`
 4. Start Jekyll server: `jekyll serve`
 
 Access, [localhost:4000/zetsu](http://localhost:4000/zetsu/)
@@ -33,7 +33,7 @@ Access, [localhost:4000/zetsu](http://localhost:4000/zetsu/)
 ### Deploy in Github pages in 2 steps
 
 1. Change the variables `GITHUB_REPONAME` and `GITHUB_REPO_BRANCH` in `Rakefile`
-2. Run `rake site:publish` for build and publish on Github
+2. Run `bundle exec rake site:publish` for build and publish on Github
 
 [Demo](https://nandomoreirame.github.io/zetsu/)
 
